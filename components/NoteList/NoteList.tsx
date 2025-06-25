@@ -1,24 +1,26 @@
-'use client';
-import cssStyles from './NoteList.module.css';
-import type { Note } from '@/types/note';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteNote } from '@/lib/api';
-import { PropagateLoader } from 'react-spinners';
 
-import { useState } from 'react';
+import cssStyles from "./NoteList.module.css";
+import type { Note } from "../../types/note";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteNote } from "../../lib/api";
+import Loading from "@/app/loading";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import { useState } from "react";
+import Link from "next/link";
 
 interface NoteListProps {
     notes: Note[];
 }
 
 export default function NoteList({ notes }: NoteListProps) {
-    const [deletingNoteId, setDeletingNoteId] = useState<Note['id'] | null>(null);
+    const [deletingNoteId, setDeletingNoteId] = useState<Note["id"] | null>(null);
+
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: async (id: Note['id']) => deleteNote(id),
+        mutationFn: async (id: Note["id"]) => deleteNote(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notes'] });
+            queryClient.invalidateQueries({ queryKey: ["notes"] });
             setDeletingNoteId(null);
         },
         onError: () => {
@@ -36,32 +38,29 @@ export default function NoteList({ notes }: NoteListProps) {
     return (
         <>
             <ul className={cssStyles.list}>
-                {notes.map((note) => (
-                    <li className={cssStyles.listItem} key={note.id}>
-                        <h2 className={cssStyles.title}>{note.title}</h2>
-                        <p className={cssStyles.content}>{note.content}</p>
-
-                        <a href={`/notes/${note.id}`} className={cssStyles.detailsLink}>
-                            View details
-                        </a>
-
-                        <div className={cssStyles.footer}>
-                            <span className={cssStyles.tag}>{note.tag}</span>
-                            <button
-                                className={cssStyles.button}
-                                onClick={() => handleDelete(note.id)}
-                                disabled={deletingNoteId === note.id}
-                            >
-                                {deletingNoteId !== note.id ? 'Delete' : 'In progress'}
-                                {deletingNoteId === note.id && (
-                                    <PropagateLoader color="#0d6efd" size={9} speedMultiplier={1} />
-                                )}
-                            </button>
-                        </div>
-                    </li>
-                ))}
+                {notes.map((note) => {
+                    return (
+                        <li className={cssStyles.listItem} key={note.id}>
+                            <h2 className={cssStyles.title}>{note.title}</h2>
+                            <p className={cssStyles.content}>{note.content}</p>
+                            <div className={cssStyles.footer}>
+                                <span className={cssStyles.tag}>{note.tag}</span>
+                                <Link href={`/notes/${note.id}`} className={cssStyles.link}>View details</Link>
+                                <button
+                                    className={cssStyles.button}
+                                    onClick={() => handleDelete(note.id)}
+                                    disabled={deletingNoteId === note.id}
+                                >
+                                    {deletingNoteId !== note.id ? "Delete" : "In progress"}
+                                    {deletingNoteId === note.id && <Loading />}
+                                </button>
+                            </div>
+                        </li>
+                    );
+                })}
             </ul>
 
+            {isError && <ErrorMessage />}
         </>
     );
 }
