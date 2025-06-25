@@ -3,7 +3,7 @@ import axios from "axios";
 import { Note } from "../types/note";
 
 
-const API_KEY = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+const API_KEY = process.env.API_TOKEN;
 if (!API_KEY) throw new Error("API token is not defined");
 
 
