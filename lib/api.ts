@@ -2,18 +2,18 @@
 import axios from "axios";
 import { Note } from "../types/note";
 
-// API token check
+
 const API_KEY = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
 if (!API_KEY) throw new Error("API token is not defined");
 
-// Axios configuration
+
 axios.defaults.baseURL = `https://notehub-public.goit.study/api`;
 axios.defaults.headers.common["Authorization"] = `Bearer ${API_KEY}`;
 
-// Pagination configuration
+
 const PER_PAGE = 12;
 
-// Types
+
 export interface NotesResponse {
     notes: Note[];
     totalPages: number;
@@ -31,7 +31,7 @@ interface SearchParams {
     search?: string;
 }
 
-// Fetch notes with optional search and pagination
+
 export async function fetchNotes(
     search: string,
     page: number
